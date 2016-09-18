@@ -4,16 +4,16 @@ const {JSONDocument, JSONSchema} = require('json-document')
 const AttributeExtractor = require('./AttributeExtractor')
 
 class JACL {
-  constructor (schema) {
+  constructor (schemaDescriptor) {
     class SchemaDocument extends JSONDocument {
       static get schema () {
-        return new JSONSchema(schema)
+        return new JSONSchema(schemaDescriptor)
       }
     }
     this.validator = (attributes) => {
       return new SchemaDocument(attributes)
     }
-    this.attributes = new AttributeExtractor(schema)
+    this.attributes = new AttributeExtractor(schemaDescriptor)
   }
 
   listAttributes (type) {
