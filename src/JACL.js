@@ -1,47 +1,51 @@
 'use strict'
 
-const {JSONDocument, JSONSchema} = require('json-document')
-const AttributeExtractor = require('./AttributeExtractor')
+const Rule = require('./Rule')
 
 class JACL {
-  constructor (schemaDescriptor) {
-    class SchemaDocument extends JSONDocument {
-      static get schema () {
-        return new JSONSchema(schemaDescriptor)
+
+  constructor (rules) {
+    this.rules = {}
+    this.attributes = {}
+    Object.keys(rules).forEach(key => {
+      this.register(key, rules[key])
+    })
+  }
+
+  register (name, rule) {
+    try {
+      let r = new Rule(rule)
+      this.attributes[name] = r.attributes
+      this.rules[name] = r
+    } catch (e) {
+      console.error(e.stack)
+      this.rules[name] = false
+    }
+  }
+
+  enforce (name, sub, obj, env) {
+    if (this.rules[name]) {
+      let rule = this.rules[name]
+      return rule.validate(sub, obj, env)
+    }
+    return false // Fail quietly
+  }
+
+  attributesList (name, type) {
+    if (this.attributes[name]) {
+      if (type === 'subject') {
+        return this.attributes[name].subject
+      } else if (type === 'object') {
+        return this.attributes[name].object
+      } else if (type === 'environment') {
+        return this.attributes[name].environment
+      } else {
+        return this.attributes[name].all
       }
     }
-    this.validator = (attributes) => {
-      return new SchemaDocument(attributes)
-    }
-    this.attributes = new AttributeExtractor(schemaDescriptor)
+    return [] // Fail quietly
   }
 
-  listAttributes (type) {
-    if (type === 'subject') {
-      return this.attributes.subject
-    } else if (type === 'object') {
-      return this.attributes.object
-    } else if (type === 'environment') {
-      return this.attributes.environment
-    } else {
-      return this.attributes.all
-    }
-  }
-
-  valid (sub, obj, env) {
-    let validator, result
-    try {
-      validator = this.validator({
-        subject: {} || sub,
-        object: {} || obj,
-        environment: {} || env
-      })
-      result = validator.validate()
-    } catch (e) {
-      return false
-    }
-    return false || result.valid
-  }
 }
 
 module.exports = JACL
