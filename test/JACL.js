@@ -24,28 +24,39 @@ const JACL = require('../src/JACL')
 describe('JACL', () => {
 
   let rule = {
+    type: 'object',
+    required: ['subject', 'environment'],
     properties: {
       subject: {
+        type: 'object',
+        required: ['staff', 'department'],
         properties: {
           staff: {
+            type: 'boolean',
             enum: [true]
           },
           department: {
+            type: 'string',
             enum: ['Computer Science', 'Information Systems']
           }
         }
       },
       environment: {
+        type: 'object',
         properties: {
           time: {
+            type: 'object',
+            required: ['hours', 'minutes'],
             anyOf: [
               {
                 properties: { 
                   hours: {
+                    type: 'number',
                     minimum: 7,
                     maximum: 17
                   },
                   minutes: {
+                    type: 'number',
                     minimum: 30
                   }
                 }
@@ -53,6 +64,7 @@ describe('JACL', () => {
               {
                 properties: {
                   hours: {
+                    type: 'number',
                     maximum: 17,
                     minimum: 8
                   }
@@ -65,20 +77,16 @@ describe('JACL', () => {
     }
   }
 
-  let invalid_rule = {
-    subject: {
-      scum: true
-    }
-  }
+  let invalid_rule = 'invalid rule'
+
+  let jacl = new JACL({valid: rule, invalid: invalid_rule})
 
   describe('authorization engine', () => {
-    let validator, subject, environment, result
+    let subject, environment, result
 
     describe('with incorrect attributes', () => {
 
       beforeEach(() => {
-        validator = new JACL(rule)
-
         subject = {
           staff: false,
           department: 'Computer Science'
@@ -91,19 +99,17 @@ describe('JACL', () => {
           }
         }
 
-        result = validator.valid(subject, null, environment)
+        result = jacl.enforce('valid', subject, null, environment)
       })
 
       it('should reject the authorization request', () => {
-        result.should.be.false
+        expect(result).to.be.false
       })
     })
 
     describe('with correct attributes', () => {
 
       beforeEach(() => {
-        validator = new JACL(rule)
-
         subject = {
           staff: true,
           department: 'Computer Science'
@@ -116,11 +122,11 @@ describe('JACL', () => {
           }
         }
 
-        result = validator.valid(subject, null, environment)
+        result = jacl.enforce('valid', subject, null, environment)
       })
 
       it('should allow the authorization request', () => {
-        result.should.be.true
+        expect(result).to.be.true
       })
 
     })
@@ -128,8 +134,6 @@ describe('JACL', () => {
     describe('with invalid rule', () => {
       
       beforeEach(() => {
-        validator = new JACL(invalid_rule)
-
         subject = {
           staff: true,
           department: 'Computer Science'
@@ -142,25 +146,24 @@ describe('JACL', () => {
           }
         }
 
-        result = validator.valid(subject, null, environment)
+        result = jacl.enforce('invalid', subject, null, environment)
       })
 
       it('should reject the authorization request', () => {
-        result.should.be.false
+        expect(result).to.be.false
       })
 
     })
   })
 
   describe('attribute list', () => {
-    let validator, subject, object, environment, all
+    let subject, object, environment, all
 
     beforeEach(() => {
-      validator = new JACL(rule)
-      subject = validator.listAttributes('subject')
-      object = validator.listAttributes('object')
-      environment = validator.listAttributes('environment')
-      all = validator.listAttributes()
+      subject = jacl.attributesList('valid', 'subject')
+      object = jacl.attributesList('valid', 'object')
+      environment = jacl.attributesList('valid', 'environment')
+      all = jacl.attributesList('valid')
     })
 
     it('subject should have two attributes', () => {
