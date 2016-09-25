@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "node index.js",
-    "test": "mocha"
+    "test": "mocha",
+    "jsdoc": "jsdoc -c jsdoc.json -r"
   },
   "repository": {
     "type": "git",
