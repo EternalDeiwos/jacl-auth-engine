@@ -107,6 +107,28 @@ describe('JACL', () => {
       })
     })
 
+    describe('with missing attributes', () => {
+
+      beforeEach(() => {
+        subject = {
+          department: 'Computer Science'
+        }
+
+        environment = {
+          time: {
+            hours: 7,
+            minutes: 31
+          }
+        }
+
+        result = jacl.enforce('valid', subject, null, environment)
+      })
+
+      it('should reject the authorization request', () => {
+        expect(result).to.be.false
+      })
+    })
+
     describe('with correct attributes', () => {
 
       beforeEach(() => {
