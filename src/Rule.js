@@ -1,6 +1,23 @@
-const {JSONSchema} = require('json-document')
+'use strict'
+
+/**
+ * Module dependencies
+ * @ignore
+ */
 const AttributeExtractor = require('./AttributeExtractor')
 
+/**
+ * External Dependencies
+ * @ignore
+ */
+const {JSONSchema} = require('json-document')
+
+/**
+ * Metaschema for ABAC Rules
+ * 
+ * @type {JSONSchema}
+ * @ignore
+ */
 const RuleSchema = new JSONSchema({
   type: 'object',
   required: ['subject', 'object', 'environment'],
@@ -20,8 +37,20 @@ const RuleSchema = new JSONSchema({
   }
 })
 
+/**
+ * Rule
+ *
+ * @class
+ * Rule defines a set of functionality for and wraps an individual rule for use
+ * in the higher level 'JACL Engine' class.
+ */
 class Rule {
   
+  /**
+   * Constructor
+   * 
+   * @param  {Object} rule - Rule schema
+   */
   constructor (rule) {
     if (!rule || typeof rule !== 'object') {
       throw new Error('Invalid Rule')
@@ -30,6 +59,18 @@ class Rule {
     this.attributesList = new AttributeExtractor(rule)
   }
 
+  /**
+   * Validate
+   *
+   * @description
+   * Evaluates the rule against a set of subject, resource and environment
+   * attributes.
+   * 
+   * @param  {Object} subject - Subject attributes
+   * @param  {Object} object - Object attributes
+   * @param  {Object} environment - Environment attributes
+   * @return {boolean} Result of rule evaluation.
+   */
   validate (subject, object, environment) {
     let raw = {}
     if (subject) { raw.subject = subject }
@@ -41,10 +82,20 @@ class Rule {
     return result.valid
   }
 
+  /**
+   * Attributes List
+   * 
+   * @description
+   * List of JSON Pointer strings of required attributes
+   * for rule evaluation.
+   */
   get attributes () {
     return this.attributesList
   }
 
 }
 
+/**
+ * Exports
+ */
 module.exports = Rule
