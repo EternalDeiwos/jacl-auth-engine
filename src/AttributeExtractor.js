@@ -1,6 +1,19 @@
 'use strict'
 
+/**
+ * AttributeExtractor
+ *
+ * @class
+ * AttributeExtractor extracts a list of attributes that are required in the
+ * rule evaluation process from a rule schema.
+ */
 class AttributeExtractor {
+
+  /**
+   * Constructor
+   * 
+   * @param  {Object} schema - Rule schema
+   */
   constructor (schema) {
     this.schema = schema
     this.sub = []
@@ -9,22 +22,57 @@ class AttributeExtractor {
     this.parse(schema)
   }
 
+  /**
+   * Subject
+   *
+   * @description
+   * List of JSON Pointer strings of required subject attributes
+   * for rule evaluation.
+   */
   get subject () {
     return this.sub
   }
 
+  /**
+   * Object
+   *
+   * @description
+   * List of JSON Pointer strings of required resource attributes
+   * for rule evaluation.
+   */
   get object () {
     return this.obj
   }
 
+  /**
+   * Environment
+   *
+   * @description
+   * List of JSON Pointer strings of required environment attributes
+   * for rule evaluation.
+   */
   get environment () {
     return this.env
   }
 
+  /**
+   * All
+   *
+   * @description
+   * List of JSON Pointer strings of all required attributes
+   * for rule evaluation.
+   */
   get all () {
     return this.sub.concat(this.obj).concat(this.env)
   }
 
+  /**
+   * Parse
+   *
+   * @description
+   * Parses the specified rule schema and extracts the names of the attributes
+   * required for rule evaluation in JSON Pointer string format.
+   */
   parse () {
     let schema = this.schema
     let attributes = []
@@ -81,4 +129,7 @@ class AttributeExtractor {
   }
 }
 
+/**
+ * Exports
+ */
 module.exports = AttributeExtractor
