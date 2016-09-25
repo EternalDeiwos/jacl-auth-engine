@@ -69,7 +69,7 @@ class Rule {
    * @param  {Object} subject - Subject attributes
    * @param  {Object} object - Object attributes
    * @param  {Object} environment - Environment attributes
-   * @return {boolean} Result of rule evaluation.
+   * @return {boolean} Rule enforcement decision (true/false) => (allow/deny)
    */
   validate (subject, object, environment) {
     let raw = {}
