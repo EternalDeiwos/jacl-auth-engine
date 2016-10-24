@@ -102,6 +102,24 @@ class JACL {
     return [] // Fail quietly
   }
 
+  /**
+   * Rule
+   *
+   * @description 
+   * Get a rule from the cache. Returns an array of rule names if name is not
+   * specified
+   * 
+   * @param  {string} [name] - name of the rule to fetch
+   * @return {*}
+   */
+  rule (name) {
+    if (name) {
+      return this.rules[name] || null
+    } else {
+      return Object.keys(this.rules)
+    }
+  }
+
 }
 
 /**
